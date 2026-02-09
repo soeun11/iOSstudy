@@ -51,16 +51,18 @@ struct MypageView: View {
             }
         } destination: { store in
             switch store.state {
-            case let .name(state):
+            case .name:
                 if let store = store.scope(state: \.name, action: \.name) {
                     EditNameView(store: store)
                 }
-                
-            case let .email(state):
-                EmptyView()
-            case let .image(state):
-                EmptyView()
-                
+            case .email:
+                if let store = store.scope(state: \.email, action: \.email) {
+                    EditEmailView(store: store)
+                }
+            case .image:
+                if let store = store.scope(state: \.image, action: \.image) {
+                    EditImagelView(store: store)
+                }
             }
         }
         
