@@ -60,7 +60,7 @@ struct MypageReducer {
                 state.userName = user.name
                 state.userEmail = user.email
                 return Effect.none
-            
+                
             case let .tapOption(option):
                 switch option {
                 case .name:
@@ -73,6 +73,16 @@ struct MypageReducer {
                 return Effect.none
                 
             case let .path(StackAction):
+                switch StackAction {
+                case let .element(id, action):
+                    switch action {
+                    case let .name(.onEditSuccess(name)):
+                        state.userName = name
+                        state.path.pop(from: id)
+                    default: return .none
+                    }
+                default: return .none
+                }
                 return Effect.none
             }
         }

@@ -14,6 +14,8 @@ struct EditNameReducer {
     @ObservableState
     struct State {
         var name: String = ""
+        
+        @Presents var alert: AlertState<Action.AlertAction>? ///nil이면 사라지고, nil아니면 뜨도록
     }
     
     enum Action {
@@ -21,6 +23,12 @@ struct EditNameReducer {
         case clearText
         case onEditFail(String)
         case onEditSuccess(String)
+        case alert(PresentationAction<AlertAction>)
+        case showAlert(String)
+        
+        enum AlertAction {
+            //alert action
+        }
     }
     
     var body: some Reducer<State, Action>  {
@@ -36,13 +44,35 @@ struct EditNameReducer {
             
             case let .onEditFail(message):
                 print("Error: \(message)")
-                return .none
+                return .send(.showAlert(message))
             
+            case let .showAlert(message):
+                state.alert = .init(title: {
+                    TextState("에러")
+                }, actions: {
+                    ButtonState {
+                        TextState("확인")
+                    }
+                }, message: {
+                    TextState("에러가 발생했습니다. \(message)")
+                })
+                return .none
+                
             case .onEditSuccess:
                 return .none
                 
+            case let .alert(presentationAction):
+                switch presentationAction {
+                case let .presented(action):
+                    //TODO: 액션 처리
+                    return .none
+                case .dismiss:
+                    state.alert = nil
+                    return .none
+                }
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 
@@ -90,6 +120,7 @@ struct EditNameView : View {
                 }
         }
         .padding(20)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
