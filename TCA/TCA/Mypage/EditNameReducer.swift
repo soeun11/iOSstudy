@@ -80,10 +80,8 @@ struct EditNameReducer {
 
 struct EditNameView : View {
     @Bindable var store: StoreOf<EditNameReducer>
-    
-    @Query private var users: [User]
     @Environment(\.modelContext) private var context
-    
+    @Query private var users: [User]
     private var user: User? {
         users.first
     }
