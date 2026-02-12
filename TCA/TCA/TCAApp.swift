@@ -13,7 +13,7 @@ import ComposableArchitecture
 struct TCAApp: App {
     var body: some Scene {
         WindowGroup {
-            SearchView()
+            SearchView(store: Store(initialState: SearchReducer.State(), reducer: {SearchReducer()}))
             //            MypageView(store: Store(initialState: MypageReducer.State(), reducer: { MypageReducer() }))
         }
         .modelContainer(modelContainer)
