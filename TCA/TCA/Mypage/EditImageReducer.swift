@@ -26,6 +26,9 @@ struct EditImageReducer {
         case setUserImage(Image)
         case authResult(Bool)
         case onSelectPhoto(id: String, data: Data)
+        case onEditSuccess(Data)
+        case onEditFail(String)
+        case alert(PresentationAction<Action>)
     }
     
     var body: some Reducer<State, Action> {
@@ -53,6 +56,14 @@ struct EditImageReducer {
             
             case let .onSelectPhoto(id, data):
                 state.selectedPhoto = (id: id, data: data)
+            
+            case let .onEditSuccess(data):
+                return .send(.setUserImageData(data))
+            
+            case let .onEditFail(error):
+                state.alert = AlertState.createAlert(type: .error(message: error))
+            case .alert:
+                return .none
             }
             return .none
         }
@@ -65,6 +76,7 @@ struct EditImagelView: View {
     let columns: [GridItem] = .init(repeating: .init(.flexible()), count: 3)
     
     @Query private var users: [User]
+    @Environment(\.modelContext) var context
     private var user: User? {
         users.first
     }
@@ -100,8 +112,29 @@ struct EditImagelView: View {
             }
             .padding(8)
         }
+        .toolbar(content: {
+            ToolbarItem {
+                Button(action: {
+                    editImage(data: store.selectedPhoto?.data)
+                }) {
+                    Text("저장")
+                }
+            }
+        })
+        .alert(store: store.scope(state: \.$alert, action: \.alert))
         .onAppear {
             store.send(.onAppear(image: user?.imageData))
+        }
+    }
+    
+    func editImage(data: Data?) {
+        guard let data else { return }
+        user?.imageData = data
+        do {
+            try context.save()
+            store.send(.onEditSuccess(data))
+        } catch let error {
+            store.send(.onEditFail(error.localizedDescription))
         }
     }
 }
