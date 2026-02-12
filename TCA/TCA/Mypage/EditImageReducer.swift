@@ -106,11 +106,11 @@ private struct AssestImageView: View {
     let onTap: (Data) -> Void
     let imageWidth = (UIScreen.main.bounds.width - 16 - 20) / 3
    
-    @State private var image: Image? = nil
+    @State private var image: UIImage? = nil
     var body: some View {
         Group {
             if let image = image {
-                image
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
             } else {
@@ -120,8 +120,7 @@ private struct AssestImageView: View {
         .frame(width: imageWidth, height: imageWidth)
         .onAppear {
             PhotoManager.fetchImage(asset: assest) { uiimage in
-                guard let uiimage else { return }
-                image = Image(uiImage: uiimage)
+                image = uiimage
             }
         }
     }
