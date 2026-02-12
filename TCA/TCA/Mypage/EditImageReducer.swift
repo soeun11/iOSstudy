@@ -16,6 +16,7 @@ struct EditImageReducer {
     struct State {
         var userImage: Image?
         var assest: [PHAsset] = []
+        var selectedPhoto: (id: String, data: Data)?
         @Presents var alert: AlertState<Action>?
     }
     
@@ -24,6 +25,7 @@ struct EditImageReducer {
         case setUserImageData(Data?)
         case setUserImage(Image)
         case authResult(Bool)
+        case onSelectPhoto(id: String, data: Data)
     }
     
     var body: some Reducer<State, Action> {
@@ -48,6 +50,9 @@ struct EditImageReducer {
                
             case let .setUserImage(image):
                 state.userImage = image
+            
+            case let .onSelectPhoto(id, data):
+                state.selectedPhoto = (id: id, data: data)
             }
             return .none
         }
@@ -85,8 +90,9 @@ struct EditImagelView: View {
             
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(store.assest, id: \.localIdentifier) { assest in
-                    AssestImageView(assest: assest, isSelected: false) { data in
-                        //TODO: - onTap 버튼 구현
+                    let isSelectedImgae = store.selectedPhoto?.id == assest.localIdentifier
+                    AssestImageView(assest: assest, isSelected: isSelectedImgae) { data in
+                        store.send(.onSelectPhoto(id: assest.localIdentifier, data: data))
                     }
                     .clipped()
                     .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -113,11 +119,23 @@ private struct AssestImageView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
+                    .onTapGesture(perform: {
+                        if let data = image.jpegData(compressionQuality: 1.0) {
+                            onTap(data)
+                        }
+                    })
             } else {
                 Color.gray.opacity(0.2)
             }
         }
         .frame(width: imageWidth, height: imageWidth)
+        .overlay(alignment: .topTrailing) {
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(Color.green)
+                    .frame(width: 20, height: 20)
+            }
+        }
         .onAppear {
             PhotoManager.fetchImage(asset: assest) { uiimage in
                 image = uiimage
