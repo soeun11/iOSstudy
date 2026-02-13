@@ -24,6 +24,22 @@ struct SearchView: View {
                     contentView
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Text("검색")
+                        .font(.headline)
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        //MYpage진입
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundStyle(.black)
+                    }
+
+                }
+            }
         }
     }
     
