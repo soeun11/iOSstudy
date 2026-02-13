@@ -37,16 +37,16 @@ struct SearchView: View {
                         Image(systemName: "gearshape.fill")
                             .foregroundStyle(.black)
                     }
-
+                    
                 }
             }
             .sheet(item: $store.scope(state: \.mypage, action: \.mypage)) { store in
                 MypageView(store: store)
             }
-            ///fullScreenCoverView도 가능 
-//            .fullScreenCover(item: $store.scope(state: \.mypage, action: \.mypage)) { store in
-//                MypageView(store: store)
-//            }
+            ///fullScreenCoverView도 가능
+            //            .fullScreenCover(item: $store.scope(state: \.mypage, action: \.mypage)) { store in
+            //                MypageView(store: store)
+            //            }
         }
     }
     
@@ -72,15 +72,25 @@ struct SearchView: View {
                     .stroke(Color.gray, lineWidth: 1)
             }
             .onSubmit {
-                //키워드 저장
                 saveKeyword(keyword: store.keyword)
-                print("keyword\(keyword.first?.title)")
-                //검색
+                store.send(.onSubmit)
             }
             .padding(.horizontal, 20)
     }
     
     private var contentView: some View {
+        
+        Group {
+            if let store = store.scope(state: \.result, action: \.result) {
+                SearchResultView()
+            } else {
+                keywordList
+            }
+        }
+    }
+    
+    var keywordList: some View {
+        // 1. 키워드 리스트
         ForEach(keyword, id: \.self) {keyword in
             HStack{
                 HStack {
@@ -93,7 +103,7 @@ struct SearchView: View {
                     Spacer()
                 }
                 .onTapGesture {
-                    //TODO: 검색
+                    store.send(.onTapKeyword(keyword.title))
                 }
                 Button {
                     deleteKeyword(keyword: keyword)
@@ -105,7 +115,6 @@ struct SearchView: View {
             .padding(20)
         }
     }
-    
     func saveKeyword(keyword: String) {
         let data = Keyword(title: keyword, date: Date.now)
         context.insert(data)
@@ -114,10 +123,10 @@ struct SearchView: View {
     
     func deleteKeyword(keyword: Keyword) {
         //TODO: 밑에 코드 이해하기 - 키워드 탐색을 위해 존재
-//        let descriptor =  FetchDescriptor<Keyword>(predicate: #Predicate{$0.title == keyword})
-//        if let model = try? context.fetch(descriptor).first {
-//            context.delete(model)
-//        }
+        //        let descriptor =  FetchDescriptor<Keyword>(predicate: #Predicate{$0.title == keyword})
+        //        if let model = try? context.fetch(descriptor).first {
+        //            context.delete(model)
+        //        }
         context.delete(keyword)
         try? context.save()
     }
