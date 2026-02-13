@@ -32,7 +32,7 @@ struct SearchView: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        //MYpage진입
+                        store.send(.onTapMyPage)
                     } label: {
                         Image(systemName: "gearshape.fill")
                             .foregroundStyle(.black)
@@ -40,6 +40,13 @@ struct SearchView: View {
 
                 }
             }
+            .sheet(item: $store.scope(state: \.mypage, action: \.mypage)) { store in
+                MypageView(store: store)
+            }
+            ///fullScreenCoverView도 가능 
+//            .fullScreenCover(item: $store.scope(state: \.mypage, action: \.mypage)) { store in
+//                MypageView(store: store)
+//            }
         }
     }
     
