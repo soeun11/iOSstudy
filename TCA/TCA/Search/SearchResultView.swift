@@ -15,9 +15,11 @@ struct SearchResultView: View {
         LazyVStack {
             ForEach(store.list) { item in
                 searchResultListItem(item: item)
+                    .padding(.bottom, 40)
                 
             }
         }
+        .padding(20)
     }
 }
 
@@ -28,8 +30,15 @@ struct searchResultListItem: View {
         VStack {
             HStack {
                 getImage(url: item.iconUrl)
+                    .frame(width: 60, height: 60)
                 
+                Text(item.name)
+                    .font(.system(size: 20, weight: .bold))
+                
+                Spacer()
             }
+            getStar(rating: item.averageUserRating, count: item.userRatingCount)
+            getScreenShot(urls: item.screenshotUrls)
         }
     }
     
@@ -40,5 +49,38 @@ struct searchResultListItem: View {
             Color.gray
         }
         .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+    
+    func getStar(rating: Float, count: Int) -> some View {
+        HStack {
+            ForEach(0..<5) { index in
+                let currentValue = rating - Float(index)
+                if currentValue >= 1 {
+                    Image(systemName: "star.fill")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                } else if currentValue > 0 {
+                    Image(systemName: "star")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                } else {
+                    EmptyView()
+                }
+            }
+            Text("\(count)")
+                .font(.system(size: 12))
+            Spacer()
+        }
+    }
+    
+    func getScreenShot (urls: [String]) -> some View {
+        let prefix = urls.prefix(3)
+        return HStack {
+            ForEach(prefix, id: \.self) { url in
+                getImage(url: url)
+                    .frame(height: 200)
+                
+            }
+        }
     }
 }
