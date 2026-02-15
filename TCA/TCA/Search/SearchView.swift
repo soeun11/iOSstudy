@@ -82,7 +82,7 @@ struct SearchView: View {
         
         Group {
             if let store = store.scope(state: \.result, action: \.result) {
-                SearchResultView()
+                SearchResultView(store: store)
             } else {
                 keywordList
             }

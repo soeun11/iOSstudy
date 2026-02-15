@@ -46,8 +46,8 @@ struct SearchReducer {
                 return .none
             
             case .onSubmit:
-                state.result =  .init()
-                return .none
+                state.result =  .init(keyword: state.keyword)
+                return .send(.result(.search))
                 
             case .onTapKeyword( let keyword):
                 state.keyword = keyword
@@ -58,12 +58,9 @@ struct SearchReducer {
                 return .none
         
             case .result(let resultAction):
-                switch resultAction {
-                    
-                }
+                return .none
             case .mypage:
                 return .none
-                
             }
         }
         //TODO: 여기 밑에 두개 $ 이거 위주로 차이점 공부하기
