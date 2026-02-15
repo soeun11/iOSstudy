@@ -7,9 +7,11 @@
 
 import ComposableArchitecture
 import SwiftUI
+import Dependencies
 
 @Reducer
 struct SearchResultReducer {
+    @Dependency(\.appRepository) var repository: AppRepository
     @ObservableState
     struct State {
         
@@ -18,5 +20,11 @@ struct SearchResultReducer {
     enum Action {
         
     }
+    
+    func fetchList(keyword: String) async {
+        //TODO: Fetch List
+      let result = await repository.fetchAppList(term: keyword, limit: 20)
+    }
 }
+
 
