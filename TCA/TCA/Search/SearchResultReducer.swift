@@ -37,8 +37,8 @@ struct SearchResultReducer {
             case let .searchResponse(.success(appList)):
                 state.list.append(contentsOf: appList)
             case let .searchResponse(.failure(error)):
-                state.alert = .createAlert(type: .error(message: "잠시후 다시 시도해주세요!"))
-            case let .alert(actoin):
+                state.alert = .createAlert(type: .error(message: error.localizedDescription))
+            case .alert(_):
                 return .none
             }
             return .none

@@ -57,7 +57,7 @@ struct SearchReducer {
                 state.mypage = .init()
                 return .none
         
-            case .result(let resultAction):
+            case .result(_):
                 return .none
             case .mypage:
                 return .none
