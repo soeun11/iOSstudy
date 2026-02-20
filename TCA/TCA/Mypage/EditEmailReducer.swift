@@ -13,7 +13,7 @@ import SwiftData
 struct EditEmailReducer {
     @ObservableState
     struct State: Equatable {
-        var email: String
+        var email: String = ""
         
         @Presents var alert: AlertState<Action>?
     }
@@ -43,6 +43,7 @@ struct EditEmailReducer {
             case .onEditFail(let message):
                 return .send(.showAlert(message))
             case .onEditSuccess(let email):
+                state.email = email
                 return .none
             case .showAlert(let message):
                 state.alert = .init(title: {

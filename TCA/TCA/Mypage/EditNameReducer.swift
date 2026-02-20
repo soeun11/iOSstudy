@@ -27,7 +27,7 @@ struct EditNameReducer {
         case showAlert(String)
         
         enum AlertAction {
-            //alert action
+            case confirmTapped
         }
     }
     
@@ -41,21 +41,25 @@ struct EditNameReducer {
             case .clearText:
                 state.name = ""
                 return .none
-            
+                
             case let .onEditFail(message):
                 print("Error: \(message)")
                 return .send(.showAlert(message))
-            
+                
             case let .showAlert(message):
-                state.alert = .init(title: {
-                    TextState("에러")
-                }, actions: {
-                    ButtonState {
-                        TextState("확인")
+                state.alert = .init(
+                    title: {
+                        TextState("에러")
+                    },
+                    actions: {
+                        ButtonState(action: .confirmTapped) {
+                            TextState("확인")
+                        }
+                    },
+                    message: {
+                        TextState("에러가 발생했습니다. \(message)")
                     }
-                }, message: {
-                    TextState("에러가 발생했습니다. \(message)")
-                })
+                )
                 return .none
                 
             case .onEditSuccess:
@@ -63,9 +67,12 @@ struct EditNameReducer {
                 
             case let .alert(presentationAction):
                 switch presentationAction {
-                case let .presented(action):
-                    //TODO: 액션 처리
-                    return .none
+                case let .presented(alertAction):
+                    switch alertAction {
+                    case .confirmTapped:
+                        state.alert = nil
+                        return .none
+                    }
                 case .dismiss:
                     state.alert = nil
                     return .none
@@ -90,7 +97,7 @@ struct EditNameView : View {
         VStack {
             Text("이름을 입력해주세요")
             TextField("이름을 입력해주세요", text: $store.name.sending(\.inputName))
-
+            
             //        TextField("이름을 입력해주세요", text: Binding(get: {
             //            store.name
             //        }, set: { name in
