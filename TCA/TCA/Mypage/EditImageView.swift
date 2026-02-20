@@ -4,50 +4,58 @@
 //
 //  Created by 소은 on 2/20/26.
 //
+
 import SwiftUI
 import SwiftData
 
 import ComposableArchitecture
+import Photos
 
 struct AssestImageView: View {
     let assest: PHAsset
     let isSelected: Bool
     let onTap: (Data) -> Void
-    
+
     @State private var image: UIImage? = nil
-    
+    @Environment(\.displayScale) private var scale
+
     var body: some View {
         GeometryReader { geo in
-            let imageWidth = geo.size.width
+            let side = geo.size.width
+            let pixelSize = CGSize(width: side * scale,
+                                     height: side * scale)
+            
             Group {
-                if let image = image {
+                if let image {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
-                        .frame(width: imageWidth, height: imageWidth)
                 } else {
                     Color.gray.opacity(0.2)
-                        .frame(width: imageWidth, height: imageWidth)
+                }
+            }
+            .frame(width: side, height: side)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(alignment: .topTrailing) {
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Color.green)
+                        .padding(6)
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if let image, let data = image.jpegData(compressionQuality: 1.0) {
+                    onTap(data)
+                }
+            }
+            .task(id: assest.localIdentifier) {
+                PhotoManager.fetchImage(asset: assest, targetSize: pixelSize) { uiimage in
+                    image = uiimage
                 }
             }
         }
         .aspectRatio(1, contentMode: .fit)
-        .overlay(alignment: .topTrailing) {
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color.green)
-                    .frame(width: 20, height: 20)
-            }
-        }
-        .onTapGesture {
-            if let image, let data = image.jpegData(compressionQuality: 1.0) {
-                onTap(data)
-            }
-        }
-        .onAppear {
-            PhotoManager.fetchImage(asset: assest) { uiimage in
-                image = uiimage
-            }
-        }
     }
 }
