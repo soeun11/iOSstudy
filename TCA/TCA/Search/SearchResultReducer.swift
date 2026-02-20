@@ -54,7 +54,6 @@ struct SearchResultReducer {
                 await send(.searchResponse(.failure(error)))
             }
         }
-        //TODO: 얘네 뭔지 파악
         .debounce(id: CancelID.search, for: 0.5, scheduler: DispatchQueue.main)
         .cancellable(id: CancelID.search, cancelInFlight: true)
     }

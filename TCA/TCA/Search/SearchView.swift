@@ -44,7 +44,7 @@ struct SearchView: View {
                 MypageView(store: store)
             }
             ///fullScreenCoverView도 가능
-            //            .fullScreenCover(item: $store.scope(state: \.mypage, action: \.mypage)) { store in
+            // .fullScreenCover(item: $store.scope(state: \.mypage, action: \.mypage)) { store in
             //                MypageView(store: store)
             //            }
         }
@@ -122,11 +122,6 @@ struct SearchView: View {
     }
     
     func deleteKeyword(keyword: Keyword) {
-        //TODO: 밑에 코드 이해하기 - 키워드 탐색을 위해 존재
-        //        let descriptor =  FetchDescriptor<Keyword>(predicate: #Predicate{$0.title == keyword})
-        //        if let model = try? context.fetch(descriptor).first {
-        //            context.delete(model)
-        //        }
         context.delete(keyword)
         try? context.save()
     }

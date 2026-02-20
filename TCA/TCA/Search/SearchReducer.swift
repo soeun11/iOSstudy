@@ -63,7 +63,6 @@ struct SearchReducer {
                 return .none
             }
         }
-        //TODO: 여기 밑에 두개 $ 이거 위주로 차이점 공부하기
         .ifLet(\.$mypage, action: \.mypage) {
             MypageReducer()
         }
