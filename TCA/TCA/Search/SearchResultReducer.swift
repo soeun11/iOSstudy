@@ -37,8 +37,8 @@ struct SearchResultReducer {
             case let .searchResponse(.success(appList)):
                 state.list.append(contentsOf: appList)
             case let .searchResponse(.failure(error)):
-                state.alert = .createAlert(type: .error(message: "잠시후 다시 시도해주세요!"))
-            case let .alert(actoin):
+                state.alert = .createAlert(type: .error(message: error.localizedDescription))
+            case .alert(_):
                 return .none
             }
             return .none
@@ -54,7 +54,6 @@ struct SearchResultReducer {
                 await send(.searchResponse(.failure(error)))
             }
         }
-        //TODO: 얘네 뭔지 파악
         .debounce(id: CancelID.search, for: 0.5, scheduler: DispatchQueue.main)
         .cancellable(id: CancelID.search, cancelInFlight: true)
     }

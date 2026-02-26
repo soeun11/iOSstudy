@@ -4,9 +4,8 @@
 //
 //  Created by 소은 on 2/10/26.
 //
-
-import Photos
 import UIKit
+import Photos
 
 struct PhotoManager {
     
@@ -29,9 +28,17 @@ struct PhotoManager {
         return assets
     }
     
-    static func fetchImage(asset: PHAsset, completion: @escaping(UIImage?) -> Void) {
+    static func fetchImage(asset: PHAsset,
+                           targetSize: CGSize,
+                           completion: @escaping(UIImage?) -> Void
+    ) {
       let manager = PHCachingImageManager()
-        manager.requestImage(for: asset, targetSize: .init(width: 60, height: 60), contentMode: .aspectFill, options: nil) { image, _ in
+        
+        manager.requestImage(for: asset,
+                             targetSize: targetSize,
+                             contentMode: .aspectFill,
+                             options: nil
+        ) { image, _ in
             completion(image)
         }
     }

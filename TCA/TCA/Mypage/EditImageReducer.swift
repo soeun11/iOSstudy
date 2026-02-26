@@ -47,19 +47,21 @@ struct EditImageReducer {
                 } else {
                     state.alert = AlertState.createAlert(type: .error(message: "권한이 없습니다."))
                 }
+                return .none
+                
             case let .setUserImageData(data):
                 guard let data, let uiImage = UIImage(data: data) else { return .none }
                 return .send(.setUserImage(Image(uiImage: uiImage)))
-               
+                
             case let .setUserImage(image):
                 state.userImage = image
-            
+                
             case let .onSelectPhoto(id, data):
                 state.selectedPhoto = (id: id, data: data)
-            
+                
             case let .onEditSuccess(data):
                 return .send(.setUserImageData(data))
-            
+                
             case let .onEditFail(error):
                 state.alert = AlertState.createAlert(type: .error(message: error))
             case .alert:
@@ -85,7 +87,6 @@ struct EditImagelView: View {
         ScrollView {
             VStack {
                 Text("선택된 이미지")
-                // 선택된 이미지
                 Group {
                     if let image = store.userImage {
                         image
@@ -135,44 +136,6 @@ struct EditImagelView: View {
             store.send(.onEditSuccess(data))
         } catch let error {
             store.send(.onEditFail(error.localizedDescription))
-        }
-    }
-}
-
-private struct AssestImageView: View {
-    let assest: PHAsset
-    let isSelected: Bool
-    let onTap: (Data) -> Void
-    let imageWidth = (UIScreen.main.bounds.width - 16 - 20) / 3
-   
-    @State private var image: UIImage? = nil
-    var body: some View {
-        Group {
-            if let image = image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .onTapGesture(perform: {
-                        if let data = image.jpegData(compressionQuality: 1.0) {
-                            onTap(data)
-                        }
-                    })
-            } else {
-                Color.gray.opacity(0.2)
-            }
-        }
-        .frame(width: imageWidth, height: imageWidth)
-        .overlay(alignment: .topTrailing) {
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color.green)
-                    .frame(width: 20, height: 20)
-            }
-        }
-        .onAppear {
-            PhotoManager.fetchImage(asset: assest) { uiimage in
-                image = uiimage
-            }
         }
     }
 }

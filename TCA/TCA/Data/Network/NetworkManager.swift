@@ -23,6 +23,7 @@ final class NetworkManager {
             .validate().serializingData().response
         
         if let error = result.error {
+            print(error)
             return .failure(NetworkError.requestFail)
         }
         
